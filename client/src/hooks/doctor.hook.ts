@@ -1,0 +1,92 @@
+import {
+  applyAsDoctor,
+  approveDoctor,
+  getAllDoctors,
+  getDoctor,
+  updateMyDoctorProfile,
+  verifyDoctorAccount,
+} from "@/api";
+import { DoctorParams } from "@/types";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
+
+export function useApplyAsDoctor() {
+  return useMutation({
+    mutationFn: applyAsDoctor,
+  });
+}
+
+export function useVerifyDoctorAccount() {
+  return useMutation({
+    mutationFn: verifyDoctorAccount,
+  });
+}
+
+
+
+
+
+ //1 first step  chek the data befor insiali the data in ui
+
+//  export function useGetAllDoctors() {
+//   return useQuery({
+//     queryKey: ["doctors"],
+//     queryFn: () => getAllDoctors(),
+//   });
+// }
+
+
+
+
+
+export function useGetAllDoctors(params: DoctorParams) {
+  return useQuery({
+    queryKey: ["doctors", params],
+     queryFn: () => getAllDoctors(params),
+  });
+}
+
+
+
+
+export function useSuspenseGetAllDoctors(params: DoctorParams) {
+  return useSuspenseQuery({
+    queryKey: ["doctors", params],
+    queryFn: () => getAllDoctors(params),
+  });
+}
+
+
+
+
+export function useUpdateMyDoctorProfile() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: updateMyDoctorProfile,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doctors"] });
+    },
+  });
+}
+
+export function useGetDoctor(doctorId: string) {
+  return useQuery({
+    queryKey: ["doctor", doctorId],
+    queryFn: () => getDoctor(doctorId),
+    enabled: Boolean(doctorId),
+  });
+}
+
+export function useApproveDoctor() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: approveDoctor,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["doctors"] });
+    },
+  });
+}
